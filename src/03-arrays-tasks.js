@@ -7,7 +7,6 @@
  *                                                                                            *
  ******************************************************************************************** */
 
-
 /**
  * Returns an index of the specified element in array or -1 if element is not found
  *
@@ -45,7 +44,6 @@ function generateOdds(len) {
   }, []);
 }
 
-
 /**
  * Returns the doubled array - elements of the specified array
  * are repeated twice using original order
@@ -61,7 +59,6 @@ function generateOdds(len) {
 function doubleArray(arr) {
   return [...arr, ...arr];
 }
-
 
 /**
  * Returns an array of positive numbers from the specified array in original order
@@ -125,7 +122,6 @@ function getUpperCaseStrings(arr) {
   return arr.map((value) => value.toUpperCase());
 }
 
-
 /**
  * Returns the array of string lengths from the specified string array.
  *
@@ -169,7 +165,6 @@ function getHead(arr, n) {
   return arr.slice(0, n);
 }
 
-
 /**
  * Returns the n last items of the specified array
  *
@@ -183,7 +178,6 @@ function getHead(arr, n) {
 function getTail(arr, n) {
   return arr.slice(-n);
 }
-
 
 /**
  * Returns CSV represebtation of two-dimentional numeric array.
@@ -230,7 +224,6 @@ function toArrayOfSquares(arr) {
   return arr.map((value) => value ** 2);
 }
 
-
 /**
  * Transforms the numeric array to the according moving sum array:
  *     f[n] = x[0] + x[1] + x[2] +...+ x[n]
@@ -271,7 +264,6 @@ function getSecondItems(arr) {
   return arr.filter((val, i) => i % 2 !== 0);
 }
 
-
 /**
  * Propagates every item in sequence its position times
  * Returns an array that consists of: one first item, two second items, tree third items etc.
@@ -294,7 +286,6 @@ function propagateItemsByPositionIndex(arr) {
   return result.flat();
 }
 
-
 /**
  * Returns the 3 largest numbers from the specified array
  *
@@ -312,7 +303,6 @@ function get3TopItems(arr) {
   return arr.sort((a, b) => b - a).slice(0, 3);
 }
 
-
 /**
  * Returns the number of positive numbers from specified array
  *
@@ -327,7 +317,10 @@ function get3TopItems(arr) {
  *   [ 1, '2' ] => 1
  */
 function getPositivesCount(arr) {
-  return arr.reduce((acc, val) => (val > 0 && !(typeof val === 'string') ? acc + 1 : acc), 0);
+  return arr.reduce(
+    (acc, val) => (val > 0 && !(typeof val === 'string') ? acc + 1 : acc),
+    0,
+  );
 }
 
 /**
@@ -424,7 +417,6 @@ function toStringList(arr) {
   return arr.join(',');
 }
 
-
 /**
  * Sorts the specified array by country name first and city name
  * (if countries are equal) in ascending order.
@@ -504,14 +496,17 @@ function getIdentityMatrix(n) {
  *     3, 3   => [ 3 ]
  */
 function getIntervalArray(start, end) {
-  return new Array(end - start + 1).fill(0).reduce((acc) => {
-    acc.arr.push(acc.current);
-    acc.current += 1;
-    return acc;
-  }, {
-    current: start,
-    arr: [],
-  }).arr;
+  return new Array(end - start + 1).fill(0).reduce(
+    (acc) => {
+      acc.arr.push(acc.current);
+      acc.current += 1;
+      return acc;
+    },
+    {
+      current: start,
+      arr: [],
+    },
+  ).arr;
 }
 
 /**
@@ -559,10 +554,21 @@ function distinct(arr) {
  *    "Poland" => ["Lodz"]
  *   }
  */
-function group(/* array, keySelector, valueSelector */) {
-  throw new Error('Not implemented');
+function group(array, keySelector, valueSelector) {
+  const map = new Map();
+  array.map((el) => {
+    if (!map.has(keySelector(el))) {
+      map.set(keySelector(el), [valueSelector(el)]);
+    } else {
+      map.set(keySelector(el), [
+        ...map.get(keySelector(el)),
+        valueSelector(el),
+      ]);
+    }
+    return true;
+  });
+  return map;
 }
-
 
 /**
  * Projects each element of the specified array to a sequence
@@ -577,10 +583,9 @@ function group(/* array, keySelector, valueSelector */) {
  *   [[1, 2], [3, 4], [5, 6]], (x) => x     =>   [ 1, 2, 3, 4, 5, 6 ]
  *   ['one','two','three'], x=>x.split('')  =>   ['o','n','e','t','w','o','t','h','r','e','e']
  */
-function selectMany(/* arr, childrenSelector */) {
-  throw new Error('Not implemented');
+function selectMany(arr, childrenSelector) {
+  return arr.map(childrenSelector).flat();
 }
-
 
 /**
  * Returns an element from the multidimentional array by the specified indexes.
@@ -597,7 +602,6 @@ function selectMany(/* arr, childrenSelector */) {
 function getElementByIndexes(/* arr, indexes */) {
   throw new Error('Not implemented');
 }
-
 
 /**
  * Swaps the head and tail of the specified array:
@@ -620,7 +624,6 @@ function getElementByIndexes(/* arr, indexes */) {
 function swapHeadAndTail(/* arr */) {
   throw new Error('Not implemented');
 }
-
 
 module.exports = {
   findElement,
