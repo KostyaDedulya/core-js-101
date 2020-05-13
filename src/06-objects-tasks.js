@@ -20,8 +20,14 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  return {
+    width,
+    height,
+    getArea() {
+      return this.width * this.height;
+    },
+  };
 }
 
 
@@ -35,8 +41,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 
@@ -51,8 +57,10 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const obj = JSON.parse(json);
+  Object.setPrototypeOf(obj, proto);
+  return obj;
 }
 
 
@@ -111,32 +119,90 @@ function fromJSON(/* proto, json */) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  selector: [],
+  prevEl: '',
+  elements: [],
+  combinators: [],
+
+  throwMoreError() {
+    throw Error('Element, id and pseudo-element should not occur more then one time inside the selector');
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  throwOrderError() {
+    throw Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    if (this.prevEl === 'element') this.throwMoreError();
+    if (this.selector.length > 0) {
+      this.elements.push(this.selector.join(''));
+      this.selector = [];
+      this.prevEl = '';
+      this.selector.push(value);
+      this.prevEl = 'element';
+      return this;
+    }
+
+    this.selector.push(value);
+    this.prevEl = 'element';
+
+    return this;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    if (this.prevEl === 'id') this.throwMoreError();
+    if (this.prevEl.match(/class|attribute|pseudo-class|pseudo-element/)) this.throwOrderError();
+    this.selector.push(`#${value}`);
+    this.prevEl = 'id';
+    return this;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    if (this.prevEl.match(/attr|pseudo-class|pseudo-element/)) this.throwOrderError();
+    this.selector.push(`.${value}`);
+    this.prevEl = 'class';
+    return this;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    if (this.prevEl.match(/pseudo-class|pseudo-element/)) this.throwOrderError();
+    this.selector.push(`[${value}]`);
+    this.prevEl = 'attr';
+    return this;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    if (this.prevEl.match(/pseudo-element/)) this.throwOrderError();
+    this.selector.push(`:${value}`);
+    this.prevEl = 'pseudo-class';
+    return this;
+  },
+
+  pseudoElement(value) {
+    if (this.prevEl === 'preudo-element') this.throwMoreError();
+    this.selector.push(`::${value}`);
+    this.prevEl = 'preudo-element';
+    return this;
+  },
+
+  combine(selector1, combinator) {
+    this.combinators.push(` ${combinator} `);
+    return this;
+  },
+
+  stringify() {
+    this.elements.push(this.selector.join(''));
+    this.selector = [];
+    this.prevEl = '';
+    const temp = [];
+    while (this.elements.length > 0) {
+      const symbol = this.combinators.pop();
+      temp.push(this.elements.shift());
+      if (symbol) temp.push(symbol);
+    }
+    this.elements = [];
+    this.combinators = [];
+    return temp.join('');
   },
 };
 
