@@ -125,15 +125,17 @@ const cssSelectorBuilder = {
   combinators: [],
 
   throwMoreError() {
-    throw Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
   },
 
   throwOrderError() {
-    throw Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    this.prevEl = '';
+    throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
   },
 
   element(value) {
     if (this.prevEl === 'element') this.throwMoreError();
+    if (this.prevEl === 'id' && value !== 'img' && value !== 'tr') this.throwOrderError();
     if (this.selector.length > 0) {
       this.elements.push(this.selector.join(''));
       this.selector = [];
@@ -151,37 +153,37 @@ const cssSelectorBuilder = {
 
   id(value) {
     if (this.prevEl === 'id') this.throwMoreError();
-    if (this.prevEl.match(/class|attribute|pseudo-class|pseudo-element/)) this.throwOrderError();
+    if (this.prevEl === 'class' || this.prevEl === 'pseudo-element') this.throwOrderError();
     this.selector.push(`#${value}`);
     this.prevEl = 'id';
     return this;
   },
 
   class(value) {
-    if (this.prevEl.match(/attr|pseudo-class|pseudo-element/)) this.throwOrderError();
+    if (this.prevEl === 'attr') this.throwOrderError();
     this.selector.push(`.${value}`);
     this.prevEl = 'class';
     return this;
   },
 
   attr(value) {
-    if (this.prevEl.match(/pseudo-class|pseudo-element/)) this.throwOrderError();
+    if (this.prevEl === 'pseudo-class') this.throwOrderError();
     this.selector.push(`[${value}]`);
     this.prevEl = 'attr';
     return this;
   },
 
   pseudoClass(value) {
-    if (this.prevEl.match(/pseudo-element/)) this.throwOrderError();
+    if (this.prevEl === 'pseudo-element') this.throwOrderError();
     this.selector.push(`:${value}`);
     this.prevEl = 'pseudo-class';
     return this;
   },
 
   pseudoElement(value) {
-    if (this.prevEl === 'preudo-element') this.throwMoreError();
+    if (this.prevEl === 'pseudo-element') this.throwMoreError();
     this.selector.push(`::${value}`);
-    this.prevEl = 'preudo-element';
+    this.prevEl = 'pseudo-element';
     return this;
   },
 
