@@ -313,8 +313,13 @@ function isCreditCardNumber(ccn) {
  *   10000 ( 1+0+0+0+0 = 1 ) => 1
  *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
  */
-function getDigitalRoot(/* num */) {
-  throw new Error('Not implemented');
+function getDigitalRoot(num) {
+  let result = num;
+  while (result > 10) {
+    const arr = String(result).split('');
+    result = arr.reduce((acc, digit) => acc + +digit, 0);
+  }
+  return result;
 }
 
 
@@ -339,8 +344,27 @@ function getDigitalRoot(/* num */) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
+function isBracketsBalanced(str) {
+  const bracketsObj = {
+    '[': ']',
+    '(': ')',
+    '{': '}',
+    '<': '>',
+  };
+  const bracketsStack = [];
+  const arr = str.split('');
+
+
+  for (let i = 0; i < arr.length; i += 1) {
+    if (arr[i] === bracketsObj[bracketsStack[bracketsStack.length - 1]]) {
+      bracketsStack.pop();
+    } else if (Object.keys(bracketsObj).includes(arr[i])) {
+      bracketsStack.push(arr[i]);
+    } else return false;
+  }
+
+  if (bracketsStack.length === 0) return true;
+  return false;
 }
 
 
@@ -364,8 +388,8 @@ function isBracketsBalanced(/* str */) {
  *    365, 4  => '11231'
  *    365, 10 => '365'
  */
-function toNaryString(/* num, n */) {
-  throw new Error('Not implemented');
+function toNaryString(num, n) {
+  return num.toString(n);
 }
 
 
@@ -381,8 +405,18 @@ function toNaryString(/* num, n */) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/webalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  const arr = pathes.map((p) => p.split('/'));
+  const control = arr[0];
+  for (let i = 1; i < arr.length; i += 1) {
+    for (let j = 0; j < arr[i].length; j += 1) {
+      if (control[j] !== arr[i][j]) {
+        control.splice(j);
+      }
+    }
+  }
+  if (control.length === 0) return '';
+  return `${control.join('/')}/`;
 }
 
 
